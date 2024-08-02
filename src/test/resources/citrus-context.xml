@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:citrus-http="http://www.citrusframework.org/schema/http/config"
+       xmlns:citrus-ws="http://www.citrusframework.org/schema/ws/config"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.citrusframework.org/schema/http/config http://www.citrusframework.org/schema/http/config/citrus-http-config.xsd
+    http://www.citrusframework.org/schema/ws/config http://www.citrusframework.org/schema/ws/config/citrus-ws-config.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:property-placeholder location="classpath:load.properties"/>
+
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
+
+    <bean id="messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory">
+          <property name="soapVersion">
+              <util:constant static-field="org.springframework.ws.soap.SoapVersion.SOAP_12"/>
+          </property>
+    </bean>
+
+    <bean id="jaxb2Marshaller" class="dto.soap.Jaxb2MarshallerCustom">
+        <property name="classesToBeBound">
+            <list>
+                <value>dto.soap.CelsiusToFahrenheit</value>
+            </list>
+        </property>
+    </bean>
+
+    <citrus-http:client id="httpClientMock"
+                        request-url="${urlMock}"
+                        content-type="application/json"
+                        timeout="5000"/>
+
+    <citrus-http:server id="httpMock"
+                        port="5455"
+                        auto-start="true"
+                        />
+
+    <citrus-ws:client id="soapClient"
+                      request-url="${soap_url}"
+                      timeout="60000"/>
+
+</beans>
